@@ -5,7 +5,7 @@ The URL to the GitHub repository: https://github.com/logan-joven/backpack-game
 ## Milestones  with deadlines
 * M1 (2/6 - 2/20): Create GitHub repository and setup Flask App
 * M2 (2/20 - 3/5): Begin rudimentary implementation of game in Flask
-* M3 (3/5 - 3/19): Create more detailed sprites in Asepsrite
+* M3 (3/5 - 3/19): Create more detailed sprites in Asesprite
 * M4 (3/19 - 4/2): Code the dynamic programming solution
 * M5 (4/2 - 4/16): Add Login/Signup to Flask App
 * M6 (4/16 - Finals): Final app cleanup and testing

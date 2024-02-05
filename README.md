@@ -20,5 +20,4 @@ to reach a certain value, which should be less than or equal to the optimal solu
 ## Market Space
 This application can educate the user on the knapsack problem while providing a fun and interactive experience. It's simplicity
 can appeal to a wide audience of children and casual users, while more experienced users may test their speed and shoot for a 
-higher score. The product can be run as a web application, or as a desktop or mobile application allowing it to be used on a 
-variety of systems.
+higher score.

@@ -15,7 +15,7 @@ def home(path):
 # path for test
 @app.route("/test")
 def test():
-    return 1
+    return "received"
 
 if __name__ == "__main__":
     app.run(debug=True)

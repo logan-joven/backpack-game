@@ -17,10 +17,10 @@
     <form action="">
 
         <label for="username">Username:</label>
-        <input type="text" placeholder="Enter Username" name="username" required>
+        <input type="text" placeholder="Enter Username" name="username">
 
         <label for="password">Password:</label>
-        <input type="password" placeholder="Enter Password" name="password" required>
+        <input type="password" placeholder="Enter Password" name="password">
 
         <!-- TODO: make the login button work -->
         <button type="login" on:click={login}>Login</button>

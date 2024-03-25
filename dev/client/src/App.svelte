@@ -1,7 +1,11 @@
 <script>
 	import Login from "./Login.svelte";
+	import Board from "./Board.svelte";
+	import CreateAccount from "./CreateAccount.svelte";
+	
 	let message = "not received";
 
+	/* function to test connection to back-end, can be modified */
 	function getTest() {
 		fetch("./test")
 			.then((d) => d.text())
@@ -18,15 +22,17 @@
 	}
 </script>
 
-<main>
-	<h1>Home</h1>
-	<h2>Server communication: {message}!</h2>
-	<button on:click={getTest}>Test Button</button>
-
+<nav>
 	<button class="btn" on:click={loginBtn}>Login</button>
 	{#if isLogin}
 		<Login on:closeIt={close}></Login>
 	{/if}
+</nav>
 
-	<h1>Game goes here?</h1>
+<main>
+	<h1>Backpack Game</h1>
+	<!-- <h2>Server communication: {message}!</h2> -->
+	<!-- <button on:click={getTest}>Test Button</button> -->
+
+	<Board />
 </main>

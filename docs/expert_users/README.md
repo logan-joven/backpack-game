@@ -9,3 +9,4 @@ To run:
 * python server.py
 * navigate into /client
 * npm run dev
+* Test on http://127.0.0.1:5000 in a browser

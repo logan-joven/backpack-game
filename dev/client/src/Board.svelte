@@ -15,17 +15,25 @@
 
     /* Function to create a new game */
     function newGame() {
-        // Generate a new random backpack
-        backpack = RandomBackpack(numItems, maxWeight, maxValue);
+    // Generate a new random backpack
+    backpack = RandomBackpack(numItems, maxWeight, maxValue);
 
-        // Reset selectedItems, selectedWeightsSum, and selectedValuesSum
-        selectedItems = [];
-        selectedWeightsSum = 0;
-        selectedValuesSum = 0;
+    // Reset selectedItems, selectedWeightsSum, and selectedValuesSum
+    selectedItems = [];
+    selectedWeightsSum = 0;
+    selectedValuesSum = 0;
 
-        // Clear checkGuessResult
-        checkGuessResult = null;
-    }
+    // Recalculate the solution
+    const weights = backpack.map((item) => item[0]);
+    const values = backpack.map((item) => item[1]);
+    solution = knapsackSolution(weights, values, maxWeight);
+
+    // Update formattedSolution
+    formattedSolution = formatItems(solution);
+
+    // Clear checkGuessResult
+    checkGuessResult = null;
+}
 
     /* Function to create the optimal solution using DP */
     function knapsackSolution(weights, values, capacity) {
@@ -68,23 +76,22 @@
         return result;
     }
 
-    /* Function to select items and add them to the selectedItems set */
-    function selectItem(weight, value) {
-        // Check if the item already exists in selectedItems
-        const isDuplicate = selectedItems.some(
+    function toggleItemSelection(weight, value) {
+        const isDuplicateIndex = selectedItems.findIndex(
             ([w, v]) => w === weight && v === value,
         );
-        // If it's not a duplicate, add it to selectedItems
-        if (!isDuplicate) {
-            selectedItems = [...selectedItems, [weight, value]];
-            sumSelectedWeights();
-            sumSelectedValues();
-        }
-    }
 
-    /* Function to remove an item from selectedItems */
-    function removeItem(index) {
-        selectedItems = selectedItems.filter((_, i) => i !== index);
+        if (isDuplicateIndex !== -1) {
+            // If the item is already selected, remove it
+            selectedItems = selectedItems.filter(
+                (_, index) => index !== isDuplicateIndex,
+            );
+        } else {
+            // If it's not selected, add it to selectedItems
+            selectedItems = [...selectedItems, [weight, value]];
+        }
+
+        // Update the total weights and values
         sumSelectedWeights();
         sumSelectedValues();
     }
@@ -151,8 +158,8 @@
     const weights = backpack.map((item) => item[0]);
     const values = backpack.map((item) => item[1]);
 
-    const solution = knapsackSolution(weights, values, 10);
-    const formattedSolution = formatItems(solution);
+    let solution = knapsackSolution(weights, values, 10);
+    let formattedSolution = formatItems(solution);
 </script>
 
 <main class="container">
@@ -165,39 +172,38 @@
         <p>Items:</p>
         <div>
             {#each backpack as [weight, value], index}
-                <button on:click={() => selectItem(weight, value)}
-                    >{`Weight: ${weight}, Value: ${value}`}</button
+                <button
+                    on:click={() => toggleItemSelection(index)}
+                    class:selectedItem={selectedItems.some(
+                        ([w, v]) => w === weight && v === value,
+                    )}
                 >
+                    {`Weight: ${weight}, Value: ${value}`}
+                </button>
             {/each}
         </div>
-        <p>Selected Items:</p>
-        <div>
-            {#each selectedItems as [weight, value], index}
-                <button on:click={() => removeItem(index)}
-                    >{`Weight: ${weight}, Value: ${value}`}</button
-                >
-            {/each}
-        </div>
-        <p>Total Weight: {selectedWeightsSum}</p>
+        <p class:exceeds-max-weight={selectedWeightsSum > maxWeight}>
+            Total Weight: {selectedWeightsSum}
+        </p>
         <p>Total Value: {selectedValuesSum}</p>
-        <button on:click={handleCheckGuess}>Check Guess</button>
-        {#if checkGuessResult !== null}
-            <p>
-                {checkGuessResult
-                    ? "Provided answer is correct!"
-                    : "Provided answer is not correct! Try again."}
-                    <button on:click={newGame}>Start New Game</button> 
-            </p>
-        {/if}
-        <p></p>
         <button on:click={handleShowSolution}>Show Solution</button>
         {#if showSolution}
             <p>
                 Solution contains: {formattedSolution}
             </p>
         {/if}
+        <button on:click={handleCheckGuess}>Check Guess</button>
+        {#if checkGuessResult !== null}
+            <p>
+                {checkGuessResult
+                    ? "Provided answer is correct!"
+                    : "Provided answer is not correct! Try again."}
+            </p>
+            <button on:click={newGame}>Start New Game</button>
+        {/if}
     </div>
 </main>
+
 
 <style>
     .container {
@@ -210,5 +216,15 @@
     .content {
         border: 1px solid black;
         padding: 20px;
+        height: 400px;
+        overflow: auto;
+    }
+
+    .exceeds-max-weight {
+        color: red;
+    }
+
+    .selectedItem {
+        background-color: yellow;
     }
 </style>

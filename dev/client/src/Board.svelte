@@ -13,8 +13,8 @@
     let checkGuessResult = null;
     let showSolution = false;
 
-    /* Function to create a new game */
-    function newGame() {
+   /* Function to create a new game */
+function newGame() {
     // Generate a new random backpack
     backpack = RandomBackpack(numItems, maxWeight, maxValue);
 
@@ -27,9 +27,6 @@
     const weights = backpack.map((item) => item[0]);
     const values = backpack.map((item) => item[1]);
     solution = knapsackSolution(weights, values, maxWeight);
-
-    // Update formattedSolution
-    formattedSolution = formatItems(solution);
 
     // Clear checkGuessResult
     checkGuessResult = null;
@@ -155,8 +152,8 @@
     let backpack = RandomBackpack(numItems, maxWeight, maxValue);
 
     // Extract weights and values
-    const weights = backpack.map((item) => item[0]);
-    const values = backpack.map((item) => item[1]);
+    let weights = backpack.map((item) => item[0]);
+    let values = backpack.map((item) => item[1]);
 
     let solution = knapsackSolution(weights, values, 10);
     let formattedSolution = formatItems(solution);
@@ -171,9 +168,9 @@
         <div>{resultMessage}</div>
         <p>Items:</p>
         <div>
-            {#each backpack as [weight, value], index}
+            {#each backpack as [weight, value]}
                 <button
-                    on:click={() => toggleItemSelection(index)}
+                    on:click={() => toggleItemSelection(weight, value)}
                     class:selectedItem={selectedItems.some(
                         ([w, v]) => w === weight && v === value,
                     )}
@@ -186,20 +183,21 @@
             Total Weight: {selectedWeightsSum}
         </p>
         <p>Total Value: {selectedValuesSum}</p>
-        <button on:click={handleShowSolution}>Show Solution</button>
-        {#if showSolution}
-            <p>
-                Solution contains: {formattedSolution}
-            </p>
-        {/if}
         <button on:click={handleCheckGuess}>Check Guess</button>
         {#if checkGuessResult !== null}
             <p>
                 {checkGuessResult
                     ? "Provided answer is correct!"
                     : "Provided answer is not correct! Try again."}
+                <button on:click={newGame}>Start New Game</button>
             </p>
-            <button on:click={newGame}>Start New Game</button>
+        {/if}
+        <p></p>
+        <button on:click={handleShowSolution}>Show Solution</button>
+        {#if showSolution}
+            <p>
+                Solution contains: {formattedSolution}
+            </p>
         {/if}
     </div>
 </main>

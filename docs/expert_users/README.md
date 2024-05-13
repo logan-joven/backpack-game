@@ -4,9 +4,8 @@ Install dependencies: python, npm, node.js, etc.
 * navigate into /client
 * npm install
 
-To run:
+To run locally:
 * navigate into /dev
-* python server.py
-* navigate into /client
-* npm run dev
+* python app.py
 * Test on http://127.0.0.1:5000 in a browser
+* Deployed at https://backpack-game.vercel.app/

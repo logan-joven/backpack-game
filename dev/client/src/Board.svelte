@@ -1,22 +1,77 @@
 <script>
-    let resultMessage = "";
-
-    // These values are currently hardcoded, but should be changed per user settings or a difficulty
+    // Default difficulty
+    let difficulty = 1;
     let numItems = 5;
     let maxWeight = 10;
     let maxValue = 100;
+    let ceiling = 5;
 
+    let startTime; // Variable to store the start time of the timer
+    let timerInterval; // Variable to store the setInterval function
+
+    // Initialize empty selection
     let selectedItems = [];
     let selectedWeightsSum = 0;
     let selectedValuesSum = 0;
 
+    // UI variables
     let checkGuessResult = null;
     let showSolution = false;
+    let showDifficultyPopup = false;
+    let score = 0;
+
+    /* Function to start the timer */
+    function startTimer() {
+        startTime = Date.now(); // Record the current time
+        updateTimerDisplay(); // Update the timer display immediately
+        // Update the timer display every second
+        timerInterval = setInterval(updateTimerDisplay, 1000);
+    }
+
+    /* Function to update the timer display */
+    function updateTimerDisplay() {
+        const elapsedTime = Date.now() - startTime; // Calculate elapsed time in milliseconds
+        const formattedTime = formatTime(elapsedTime); // Format elapsed time
+        // Display formatted time in the timer element
+        document.getElementById("timer").innerText = formattedTime;
+    }
+
+    /* Function to format elapsed time */
+    function formatTime(milliseconds) {
+        const totalSeconds = Math.floor(milliseconds / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        // Return formatted time as HH:MM:SS
+        return `${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
+    }
+
+    /* Helper function to pad zero for single-digit numbers */
+    function padZero(num) {
+        return num < 10 ? `0${num}` : num;
+    }
+
+    function setDifficulty(difficulty) {
+        if (difficulty == 1) {
+            numItems = 5;
+            maxWeight = 10;
+            maxValue = 100;
+            ceiling = 5;
+        } else if (difficulty == 2) {
+            numItems = 10;
+            maxWeight = 50;
+            maxValue = 200;
+            ceiling = 25;
+        }
+        // Reset the game with the new parameters
+        newGame();
+    }
 
     /* Function to create a new game */
     function newGame() {
+        startTimer();
         // Generate a new random backpack
-        backpack = RandomBackpack(numItems, maxWeight, maxValue);
+        backpack = RandomBackpack(numItems, ceiling, maxValue);
 
         // Reset selectedItems, selectedWeightsSum, and selectedValuesSum
         selectedItems = [];
@@ -30,6 +85,16 @@
 
         // Clear checkGuessResult
         checkGuessResult = null;
+
+        // Set showSolution to false
+        showSolution = false;
+
+        // Close the pop-up
+        showDifficultyPopup = false;
+
+        // Generate new hint
+        hintCounter = 0;
+        hint = formatItems(solution.slice(0, hintCounter));
     }
 
     /* Function to create the optimal solution using DP */
@@ -116,10 +181,18 @@
         const sortedSelectedItems = selectedItems.slice().sort();
 
         // Check if each item in sortedSolution matches its corresponding item in sortedSelectedItems
-        return sortedSolution.every((item, index) => {
+        const isCorrect = sortedSolution.every((item, index) => {
             const selectedItem = sortedSelectedItems[index];
             return item[0] === selectedItem[0] && item[1] === selectedItem[1];
         });
+
+        // If guess is correct, stop the timer
+        if (isCorrect) {
+            score+= 100 * difficulty;
+            clearInterval(timerInterval);
+        }
+
+        return isCorrect;
     }
 
     /* Helper function for the check button */
@@ -127,9 +200,21 @@
         checkGuessResult = checkGuess();
     }
 
-    /* Helper function for the show solution button. May be removed later. */
-    function handleShowSolution() {
-        showSolution ^= true; // xor = true flips every time
+    /* Helper function for the show partial solution button.*/
+    function showPartialSolution() {
+            score -= 10 * difficulty;
+            hintCounter++;
+        hint = formatItems(solution.slice(0, hintCounter));
+        showSolution = true;
+    }
+
+    function hidePartialSolution() {
+        showSolution = false;
+    }
+
+    /* Helper function for the change difficulty button */
+    function toggleDifficultyPopup() {
+        showDifficultyPopup = !showDifficultyPopup;
     }
 
     /* Function to sum the weights of the selectedItems */
@@ -149,27 +234,29 @@
     }
 
     // Generate a random backpack to be used for the problem
-    let backpack = RandomBackpack(numItems, maxWeight, maxValue);
+    let backpack = RandomBackpack(numItems, ceiling, maxValue);
 
     // Extract weights and values
     let weights = backpack.map((item) => item[0]);
     let values = backpack.map((item) => item[1]);
 
     let solution = knapsackSolution(weights, values, 10);
-    let formattedSolution = formatItems(solution);
+    let hintCounter = 0;
+    let hint = formatItems(solution.slice(0, 1));
+    window.addEventListener("load", startTimer);
 </script>
 
 <main class="container">
     <div class="content">
         <p>
-            Try to fill the most valuable backpack that holds at most 10 (in
-            weight).
+            Try to fill the most valuable backpack that holds at most {maxWeight}
+            (in weight).
         </p>
-        <div>{resultMessage}</div>
         <p>Items:</p>
         <div>
             {#each backpack as [weight, value]}
                 <button
+                    style="width: 100px;"
                     on:click={() => toggleItemSelection(weight, value)}
                     class:selectedItem={selectedItems.some(
                         ([w, v]) => w === weight && v === value,
@@ -183,21 +270,34 @@
             Total Weight: {selectedWeightsSum}
         </p>
         <p>Total Value: {selectedValuesSum}</p>
+        <p>Time Elapsed: <span id="timer">00:00:00</span></p>
+        <p>Score: {score}</p>
         <button on:click={handleCheckGuess}>Check Guess</button>
         {#if checkGuessResult !== null}
             <p>
-                {checkGuessResult
-                    ? "Provided answer is correct!"
-                    : "Provided answer is not correct! Try again."}
+                {#if checkGuessResult}
+                    <span style="color: green;">Correct!</span>
+                {:else}
+                    <span style="color: red;"
+                        >Incorrect! Try again or start a new game.</span
+                    >
+                {/if}
                 <button on:click={newGame}>Start New Game</button>
             </p>
         {/if}
         <p></p>
-        <button on:click={handleShowSolution}>Show Solution</button>
+        <button on:click={toggleDifficultyPopup}>Change Difficulty</button>
+        {#if showDifficultyPopup}
+            <div class="popup">
+                <button on:click={() => setDifficulty(1)}>Normal</button>
+                <button on:click={() => setDifficulty(2)}>Hard</button>
+            </div>
+        {/if}
+        <button on:click={showPartialSolution}>Show Hint</button>
         {#if showSolution}
-            <p>
-                Solution contains: {formattedSolution}
-            </p>
+            <button class="hint" on:click={hidePartialSolution}>
+                Solution contains: {hint}
+            </button>
         {/if}
     </div>
 </main>
@@ -207,14 +307,15 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
+        height: 100;
     }
 
     .content {
         border: 1px solid black;
         padding: 20px;
-        height: 400px;
+        height: 500px;
         overflow: auto;
+        text-align: center;
     }
 
     .exceeds-max-weight {
@@ -223,5 +324,35 @@
 
     .selectedItem {
         background-color: yellow;
+    }
+
+    .popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        border: 1px solid black;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hint {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, 50%);
+        background-color: white;
+        padding: 20px;
+        border: 1px solid black;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 </style>

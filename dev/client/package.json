@@ -20,6 +20,8 @@
     "vercel": "^34.1.3"
   },
   "dependencies": {
-    "sirv-cli": "^2.0.0"
+    "pg": "^8.11.5",
+    "sirv-cli": "^2.0.0",
+    "svelte-spa-router": "^4.0.1"
   }
 }

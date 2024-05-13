@@ -1,31 +1,52 @@
 <script>
-    import { createEventDispatcher } from "svelte";
+    import { sql } from "@vercel/postgres";
+
     import { fly, fade } from "svelte/transition";
 
-    const dispatch = createEventDispatcher();
+    let username = "";
+    let password = "";
 
-    function close() {
-        dispatch("closeIt");
-    }
-    function login() {
-        dispatch("closeIt");
+    function close() {}
+    async function login() {
+        try {
+            const client = await pool.connect();
+            const result = await client.query(
+                sql`SELECT * FROM users WHERE username = ${username} AND password = ${password}`,
+            );
+            client.release();
+
+            if (result.rows.length > 0) {
+                // Login successful
+                console.log("Login successful");
+            } else {
+                // Invalid username or password
+                console.log("Invalid username or password");
+            }
+        } catch (error) {
+            console.error("Error during login:", error);
+        }
     }
 </script>
 
 <div class="background" transition:fade on:keypress={close} />
-<div class="login-box" transition:fly={{ y: -500 }}>
-    <form action="">
+<div class="login-container">
+    <div class="login-box" transition:fly={{ y: -500 }}>
+        <form action="">
+            <label for="username">Username:</label>
+            <input type="text" placeholder="Enter Username" name="username" />
 
-        <label for="username">Username:</label>
-        <input type="text" placeholder="Enter Username" name="username">
+            <label for="password">Password:</label>
+            <input
+                type="password"
+                placeholder="Enter Password"
+                name="password"
+            />
 
-        <label for="password">Password:</label>
-        <input type="password" placeholder="Enter Password" name="password">
-
-        <!-- TODO: make the login button work -->
-        <button type="login" on:click={login}>Login</button>
-        <button type="close" on:click={close}>Close</button>
-    </form>
+            <!-- TODO: make the login button work -->
+            <button type="login" on:click={login}>Login</button>
+            <button type="close" on:click={close}>Close</button>
+        </form>
+    </div>
 </div>
 
 <style>
@@ -51,6 +72,19 @@
         background-color: rgb(148, 148, 148);
         border: solid 5px white;
         z-index: 5;
+    }
+
+    /* Container to center the register box */
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 100vw;
+        z-index: 3;
     }
 
     /* format the text */

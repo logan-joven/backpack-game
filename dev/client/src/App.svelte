@@ -1,54 +1,88 @@
 <script>
-	import Login from "./Login.svelte";
-	import Board from "./Board.svelte";
-	import CreateAccount from "./CreateAccount.svelte";
-	
-	let message = "not received";
+    import Login from "./Login.svelte";
+    import Register from "./Register.svelte";
+    import Board from "./Board.svelte";
 
-	/* function to test connection to back-end, can be modified */
-	function getTest() {
-		fetch("./test")
-			.then((d) => d.text())
-			.then((d) => (message = d));
-	}
+    let message = "not received";
+    let showLogin = false; // Track whether the Login component should be shown
+    let showRegister = false; // Track whether the Register component should be shown
 
-	let isLogin = false;
+    /* function to test connection to back-end, can be modified */
+    function getTest() {
+        fetch("./test")
+            .then((d) => d.text())
+            .then((d) => (message = d));
+    }
 
-	function loginBtn() {
-		isLogin = true;
-	}
-	function close() {
-		isLogin = false;
-	}
+    // Function to toggle showLogin when the Enter key is pressed
+    function toggleLogin() {
+        showLogin = true;
+    }
+
+    function toggleRegister() {
+        showRegister = true;
+    }
 </script>
 
-<!-- <nav>
-	<a href="#">Left Link</a>
-	<a href="#">Right Link</a>
-</nav> -->
-
-<main class="container">
-	<h1 class="content">Backpack Game</h1>
-	<Board />
+<main>
+    <!-- <header class="header">
+        <nav>
+            <ul class="button-container">
+                <li>
+                    <button class="button" on:click={toggleLogin} on:keydown={(e) => e.key === "Enter" && toggleLogin()} tabindex="0">Login</button>
+                </li>
+                <li>
+                    <button class="button" on:click={toggleRegister} on:keydown={(e) => e.key === "Enter" && toggleRegister()} tabindex="0">Register</button>
+                </li>
+            </ul>
+        </nav>
+        {#if showLogin}
+            <Login />
+        {/if}
+        {#if showRegister}
+            <Register />
+        {/if}
+    </header> -->
+	<header class="title">
+		Backpack Game
+	</header>
+    <Board />
 </main>
 
 <style>
-    .container {
-		background-color: #f0f0f0;
+    main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+	.title {
+        font-size: 36px;
+    }
+
+    /* .header {
+		background-color: black;
         margin: 0;
         padding: 0;
         font-family: Arial, sans-serif;
         display: flex;
-        justify-content: center;
+        justify-content: flex-end;
         align-items: center;
-        min-height: 100vh;
     }
 
-    .content {
-        max-width: 800px;
-        padding: 20px;
-        background-color: #ffffff;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    .button-container {
+        list-style: none;
+        margin: 10;
+        padding: 10;
+        display: flex;
     }
+
+    .button-container li {
+        margin: 5px;
+    }
+
+	.button {
+		width: 120px;
+        height: 40px;
+	} */
 </style>

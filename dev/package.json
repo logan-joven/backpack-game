@@ -1,5 +1,8 @@
 {
   "devDependencies": {
     "vercel": "^34.1.11"
+  },
+  "dependencies": {
+    "@vercel/postgres": "^0.8.0"
   }
 }

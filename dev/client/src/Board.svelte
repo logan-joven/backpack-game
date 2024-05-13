@@ -13,24 +13,24 @@
     let checkGuessResult = null;
     let showSolution = false;
 
-   /* Function to create a new game */
-function newGame() {
-    // Generate a new random backpack
-    backpack = RandomBackpack(numItems, maxWeight, maxValue);
+    /* Function to create a new game */
+    function newGame() {
+        // Generate a new random backpack
+        backpack = RandomBackpack(numItems, maxWeight, maxValue);
 
-    // Reset selectedItems, selectedWeightsSum, and selectedValuesSum
-    selectedItems = [];
-    selectedWeightsSum = 0;
-    selectedValuesSum = 0;
+        // Reset selectedItems, selectedWeightsSum, and selectedValuesSum
+        selectedItems = [];
+        selectedWeightsSum = 0;
+        selectedValuesSum = 0;
 
-    // Recalculate the solution
-    const weights = backpack.map((item) => item[0]);
-    const values = backpack.map((item) => item[1]);
-    solution = knapsackSolution(weights, values, maxWeight);
+        // Recalculate the solution
+        const weights = backpack.map((item) => item[0]);
+        const values = backpack.map((item) => item[1]);
+        solution = knapsackSolution(weights, values, maxWeight);
 
-    // Clear checkGuessResult
-    checkGuessResult = null;
-}
+        // Clear checkGuessResult
+        checkGuessResult = null;
+    }
 
     /* Function to create the optimal solution using DP */
     function knapsackSolution(weights, values, capacity) {
@@ -201,7 +201,6 @@ function newGame() {
         {/if}
     </div>
 </main>
-
 
 <style>
     .container {

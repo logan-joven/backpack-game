@@ -1,12 +1,9 @@
 import pg from 'pg';
 
 // PostgreSQL connection pool configuration
+// Credentials come from the POSTGRES_URL environment variable (set in Vercel)
 const pool = new pg.Pool({
-  user: 'default',
-  host: 'ep-billowing-star-a65vgmqb-pooler.us-west-2.aws.neon.tech',
-  database: 'verceldb',
-  password: '2HTYv6yrloqb',
-  port: 5432, // PostgreSQL default port
+  connectionString: process.env.POSTGRES_URL,
 });
 
 export { pool };
